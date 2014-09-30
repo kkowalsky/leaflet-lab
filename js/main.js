@@ -1,107 +1,163 @@
-$(document).ready(function() {
+$(document).ready(function(){
 
-		var cities;
-		var map = L.map('map', {
-					center: [38, -96],
-					zoom: 4,
-					minZoom: 4
-			});
+        var cities;
+        var map = L.map('map', {
+                    center: [38, -96],
+                    zoom: 4,
+                    minZoom: 4
+            });
 
-			L.tileLayer(
-			'http://{s}.acetate.geoiq.com/tiles/acetate/{z}/{x}/{y}.png', {
-						attribution: 'GeoIQ tileset'
-			}).addTo(map);
+            L.tileLayer(
+            'http://a.tile.stamen.com/toner/{z}/{x}/{y}.png', {
+                        attribution: '<a href="http://">Stamen tileset</a>'
+            }).addTo(map);
 
-		$.getJSON("data/kowalskymap.geojson")
-			.done(function(data) {
-				var info = processData(data);
-				createPropSymbols(info.timestamps, data);
-			})
-		.fail(function() { alert("There has been a problem loading the data")});
+        $.getJSON("data/leafletmapdata.geojson")
+            .done(function(data) {
+                var info = processData(data);
+                createPropSymbols(info.timestamps, data);
+                createLegend(info.min, info.max);
+            })
+        .fail(function() { alert("There has been a problem loading the data")});
 
-		function processData(data){
-			var timestamps = [];
-			var min = Infinity;
-			var max = -Infinity;
+        function processData(data){
+            var timestamps = [];
+            var min = Infinity;
+            var max = -Infinity;
 
-						for (var feature in data.features) {
-								var properties = data.features[feature].properties;
+                        for (var feature in data.features) {
+                                var properties = data.features[feature].properties;
 
-								for (var attribute in properties) {
-											if (attribute != 'id' &&
-													attribute != 'name' &&
-													attribute != 'lat' &&
-													attribute != 'lon') {
+                                for (var attribute in properties) {
+                                    if (attribute != 'id' &&
+                                        attribute != 'city' &&
+                                        attribute != 'lat' &&
+                                        attribute != 'lon') {
 
-												if ($.inArray(attribute, timestamps) === -1){
-													timestamps.push(attribute);
-												}
+                                        if ($.inArray(attribute, timestamps) === -1){
+                                            timestamps.push(attribute);
+                                        }
 
-												if (properties[attribute] < min) {
-													min = properties[attribute];
-												}
+                                        if (properties[attribute] < min) {
+                                            min = properties[attribute];
+                                        }
 
-												if (properties[attribute] > max) {
-													max = properties[attribute];
-												}
-								}
-						}
-			}
+                                        if (properties[attribute] > max) {
+                                            max = properties[attribute];
+                                        }
+                                }
+                        }
+            };
 
-			return {
-				timestamps : timestamps,
-				min : min,
-				max : max
-			}
+            return {
+                timestamps : timestamps,
+                min : min,
+                max : max
+            };
+        }; //end ProcessData function
 
-		} //end processData()
+        function createLegend(min, max){
+            if(min < 100) {
+                min = 100;
+            }
+            
+            function roundNumber(inNumber){
+                return (Math.round(inNumber/10) * 10);   
+            }
+            var legend = L.control({position: "bottomright"});
 
-		function createPropSymbols(timestamps, data){
+            legend.onAdd = function(map) {
+                var legendContainer = L.DomUtil.create("div", "legend");
+                var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
+                var classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)];
+                var legendCircle;
+                var lastRadius = 0;
+                var currentRadius;
+                var margin;
 
-					cities= L.geoJson(data, {
+                L.DomEvent.addListener(legendContainer, 'mousedown', function(e){
+                    L.DomEvent.stopPropagation(e);
+                })
 
-								pointToLayer: function(feature, latlng) {
+                $(legendContainer).append("<h2 id='legendTitle'># of Assaults</h2>");
 
-										return L.circleMarker(latlng, {
-											fillColor: "#708598",
-											color: '#537898',
-											weight: 1,
-											fillOpacity: 0.6
+                for (var i = 0; i <= classes.length-1; i++){
+                    legendCircle = L.DomUtil.create("div", "legendCircle");
 
-											}).on({
+                    currentRadius = calcPropRadius(classes[i]);
+
+                    margin = -currentRadius - lastRadius - 2;
+
+                    $(legendCircle).css({
+                        "width": currentRadius*2 + "px",
+                        "height": currentRadius*2 + "px",
+                        "margin-left": margin + "px"
+                    });
+
+                    $(legendCircle).append("<span class='legendValue'>" + classes[i] + "</span>");
+                    $(symbolsContainer).append(legendCircle);
+
+                    lastRadius = currentRadius;
+                }
+                $(legendContainer).append(symbolsContainer);
+
+                return legendContainer;
+
+            };
+            
+            legend.addTo(map);
+        }; //end createLegend
 
 
-														mouseover: function(e) {
-																	this.openPopup();
-																	this.setStyle({color: '#808080 ', weight: 2});
-														},
 
-														mouseout: function(e) {
-																	this.closePopup();
-																	this.setStyle({color: '#537898'});
-														}
-										});
-								}
-					}).addTo(map);
+        function createPropSymbols(timestamps, data){
 
-					updatePropSymbols(timestamps[0]);
-		} //end createPropSymbols()
+                    cities= L.geoJson(data, {
 
-		function updatePropSymbols(timestamp){
-			cities.eachLayer(function(layer){
-				var props = layer.feature.properties;
-				var radius = calcPropRadius(props[timestamp]);
-				var popupContent = "<b>" + String(props[timestamp]) +
-					" assaults</b><br>" + "<i>" + props.name + "</i> in <i>" + timestamp + "</i>";
+                                pointToLayer: function(feature, latlng) {
 
-					layer.setRadius(radius);
-					layer.bindPopup(popupContent, {offset: new L.Point(0, -radius) });
-			});
-		}//end updatePropSymbols
+                                        return L.circleMarker(latlng, {
+                                            fillColor: "rgba(100, 0, 0, .8)",
+                                            color: 'rgba(100, 0, 0, .8)',
+                                            weight: 1,
+                                            fillOpacity: 0.6
 
-		function calcPropRadius(attributeValue){
-			var scaleFactor = .85;
-			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI) * 2;
-		}//end calcPropRadius
-	});
+                                            }).on({
+                                                mouseover: function(e) {
+                                                    this.openPopup();
+                                                    this.setStyle({color: '#330000', weight: 2});
+                                                },
+
+                                                mouseout: function(e) {
+                                                    this.closePopup();
+                                                    this.setStyle({color: '#330000'});
+                                                }
+                                        });
+                                }
+                    }).addTo(map);
+
+                    updatePropSymbols(timestamps[0]);
+        } //end createPropSymbols()
+
+        function updatePropSymbols(timestamp){
+            cities.eachLayer(function(layer){
+                var props = layer.feature.properties;
+                var radius = calcPropRadius(props[timestamp]);
+                console.log(props.City);
+                var popupContent = "<b>" + String(props[timestamp]) +
+                    " assaults</b><br>" + "<i>" + props.City + "</i> in <i>" + timestamp + "</i>";
+
+                    layer.setRadius(radius);
+                    layer.bindPopup(popupContent, {offset: new L.Point(0, -radius) });
+            });
+        }//end updatePropSymbols
+
+
+        function calcPropRadius(attributeValue){
+            var scaleFactor = .85;
+            var area = attributeValue * scaleFactor;
+            return Math.sqrt(area/Math.PI) * 2;
+        }//end calcPropRadius
+
+
+    });//end main.js

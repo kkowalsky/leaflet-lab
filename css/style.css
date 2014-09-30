@@ -39,17 +39,17 @@ h2,div, span {
 }
 .symbolsContainer {
     float: left;
-	margin-left: 50px;
+	margin: 0 50px;
 }
 .legendCircle {
      border-radius:50%;
-     border: 1px solid #537898;
-     background: rgba(113, 133, 152, .6);
+     border: 2px solid #330000;
+     background: rgba(100, 0, 0, .6);
 	 display: inline-block;
 }
 .legendValue {
     position: absolute;
-    right: 8px;
+    right: 10px;
 }
 .range-slider {
     width: 250px;
