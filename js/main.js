@@ -9,7 +9,7 @@ $(document).ready(function(){
     
             L.tileLayer(
             'http://a.tile.stamen.com/toner-background/{z}/{x}/{y}.png', {
-                        attribution: '<a href="http://">Stamen tileset</a>'
+                        attribution: '<a href="http://maps.stamen.com">Stamen tileset</a>'
             }).addTo(map);
 
         $.getJSON("data/leafletmapdata.geojson")
@@ -191,9 +191,10 @@ $(document).ready(function(){
             var temporalLegend = L.control({ position: 'bottomleft'});
             temporalLegend.onAdd = function(map) {
                 var output = L.DomUtil.create("output", "temporal-legend");
+                $(output).text(startTimestamp);
                 return output;
             }
-           
+            
             
             temporalLegend.addTo(map);
         } //end createTemporalLegend
