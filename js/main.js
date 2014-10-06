@@ -1,14 +1,14 @@
 $(document).ready(function(){
-
         var cities;
+        var timestamps = [];
         var map = L.map('map', {
                     center: [38, -96],
                     zoom: 4,
                     minZoom: 4
             });
-
+    
             L.tileLayer(
-            'http://a.tile.stamen.com/toner/{z}/{x}/{y}.png', {
+            'http://a.tile.stamen.com/toner-background/{z}/{x}/{y}.png', {
                         attribution: '<a href="http://">Stamen tileset</a>'
             }).addTo(map);
 
@@ -17,11 +17,11 @@ $(document).ready(function(){
                 var info = processData(data);
                 createPropSymbols(info.timestamps, data);
                 createLegend(info.min, info.max);
+                createSliderUI(info.timestamps);
             })
         .fail(function() { alert("There has been a problem loading the data")});
-
+    
         function processData(data){
-            var timestamps = [];
             var min = Infinity;
             var max = -Infinity;
 
@@ -79,7 +79,7 @@ $(document).ready(function(){
                     L.DomEvent.stopPropagation(e);
                 })
 
-                $(legendContainer).append("<h2 id='legendTitle'># of Assaults</h2>");
+                $(legendContainer).append("<h4 id='legendTitle'># of Assaults</h4><center><i>per 100,000 people</center></i><br>");
 
                 for (var i = 0; i <= classes.length-1; i++){
                     legendCircle = L.DomUtil.create("div", "legendCircle");
@@ -119,45 +119,85 @@ $(document).ready(function(){
                                         return L.circleMarker(latlng, {
                                             fillColor: "rgba(100, 0, 0, .8)",
                                             color: 'rgba(100, 0, 0, .8)',
-                                            weight: 1,
+                                            weight: 2,
                                             fillOpacity: 0.6
 
                                             }).on({
                                                 mouseover: function(e) {
                                                     this.openPopup();
-                                                    this.setStyle({color: '#330000', weight: 2});
+                                                    this.setStyle({color: '#808080', weight: 4});
                                                 },
-
+                                            
                                                 mouseout: function(e) {
                                                     this.closePopup();
-                                                    this.setStyle({color: '#330000'});
+                                                    this.setStyle({color: 'rgba(100, 0, 0, .8)', weight: 2});
                                                 }
+                                                
                                         });
                                 }
                     }).addTo(map);
 
-                    updatePropSymbols(timestamps[0]);
-        } //end createPropSymbols()
+                    updatePropSymbols(0);
+        }; //end createPropSymbols()
 
         function updatePropSymbols(timestamp){
             cities.eachLayer(function(layer){
                 var props = layer.feature.properties;
-                var radius = calcPropRadius(props[timestamp]);
-                console.log(props.City);
-                var popupContent = "<b>" + String(props[timestamp]) +
-                    " assaults</b><br>" + "<i>" + props.City + "</i> in <i>" + timestamp + "</i>";
-
+                var radius = calcPropRadius(props[timestamps[timestamp]]);
+                var popupContent = "<b>" + props[timestamps[timestamp]] +
+                    " assaults</b><br>" + "<i>" + props.City + "</i> in <i>" + timestamps[timestamp] + "</i>";
+                
                     layer.setRadius(radius);
                     layer.bindPopup(popupContent, {offset: new L.Point(0, -radius) });
             });
-        }//end updatePropSymbols
+        }; //end updatePropSymbols
 
 
         function calcPropRadius(attributeValue){
-            var scaleFactor = .85;
+            var scaleFactor = 1;
             var area = attributeValue * scaleFactor;
             return Math.sqrt(area/Math.PI) * 2;
-        }//end calcPropRadius
+        }; //end calcPropRadius
+
+        function createSliderUI(timestamps){
+            var sliderControl = L.control({ position: 'bottomleft'} );
+            
+            sliderControl.onAdd = function(map) {
+                var slider = L.DomUtil.create("input", "range-slider");
+                
+                L.DomEvent.addListener(slider, 'mousedown', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                });
+                
+                $(slider)
+                    .attr({'type':'range',
+                        'max': timestamps.length-2,
+                        'min': 0,
+                        'step': 1,
+                        'value': 0
+                     }).on('input', function() {
+                       updatePropSymbols($(this).val());
+                       $('.temporal-legend').text(timestamps[this.value]);
+                });
+                return slider;
+    
+            }
+            
+            sliderControl.addTo(map);
+            createTemporalLegend(timestamps[0]);  
+        } //end sliderUI
+  
+        function createTemporalLegend(startTimestamp) {
+            var temporalLegend = L.control({ position: 'bottomleft'});
+            temporalLegend.onAdd = function(map) {
+                var output = L.DomUtil.create("output", "temporal-legend");
+                return output;
+            }
+           
+            
+            temporalLegend.addTo(map);
+        } //end createTemporalLegend
+    
+});//end main.js
 
 
-    });//end main.js

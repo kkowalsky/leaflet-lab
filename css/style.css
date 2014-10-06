@@ -1,13 +1,28 @@
 /* Stylesheet written by Rich Donohue and Carl Sack for Time Series Proportional Symbol Maps with Leaflet and JQuery */
-
+@import url(http://fonts.googleapis.com/css?family=Oswald|Open+Sans:400,300);
 body {
-    font-family: sans-serif;
+    font-family: 'Open Sans', sans-serif;
+    background-image: url('../img/mochaGrunge.png'); 
 }
 h2 {
+    font-size: 2em;
+    margin-top: 15px;
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 5px;
+}
+h3{
+    font-family: 'Open Sans', sans-serif;
+    margin-top: -25px;
+    color: #b2b2b2;
+}
+h4{
     font-size: 1.2em;
     margin-top: 3px;
+    font-family: sans-serif;
 }
-h2,div, span {
+
+
+h2, h3, h4,div, span {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -15,6 +30,19 @@ h2,div, span {
 	-ms-user-select: none;
 	user-select: none;
 }
+.header{
+    height: 100px;
+    background: #660000;
+    margin: 0px auto;
+    width: 100%;
+    padding: 0;
+}
+.header-cont{
+    width: 100%;
+    position: fixed;
+    top: 0px;
+}
+
 #wrapper {
     width: 960px;
     margin: 15px auto;
@@ -58,3 +86,5 @@ h2,div, span {
     font-size: 1.2em;
     text-align: center;
 }
+
+
