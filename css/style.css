@@ -1,4 +1,5 @@
 /* Stylesheet written by Rich Donohue and Carl Sack for Time Series Proportional Symbol Maps with Leaflet and JQuery */
+
 @import url(http://fonts.googleapis.com/css?family=Oswald|Open+Sans:400,300);
 body {
     font-family: 'Open Sans', sans-serif;
@@ -20,7 +21,12 @@ h4{
     margin-top: 3px;
     font-family: sans-serif;
 }
-
+h5{
+    font-size: 1.2em;
+    margin-top: 20px;
+    margin-bottom: 0px;
+    font-family: sans-serif;
+}
 
 h2, h3, h4,div, span {
 	-webkit-touch-callout: none;
@@ -44,14 +50,31 @@ h2, h3, h4,div, span {
 }
 
 #wrapper {
-    width: 960px;
-    margin: 15px auto;
+	box-shadow: 0px 0px 10px #383838;
+    width: 840px;
+    float: left;
+    margin-top: 10px;
+    margin-left: 25px;
+    
 }
 #map {
 	height: 450px;
-	margin: 15px auto 15px;
 }
-
+#text {
+    -moz-box-shadow: 0px 0px 10px #383838;
+	-webkit-box-shadow: 0px 0px 10px #383838;
+	box-shadow: 0px 0px 10px #383838;
+    margin-top: 10px;
+    margin-left: 0px;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 300px;
+    float: right;
+    display: inline-block;
+    margin-right: 25px;
+    background: white;
+    
+}
 .legend, .temporal-legend {
     padding: 6px 10px;
     font: 14px/16px Arial, Helvetica, sans-serif;
@@ -86,10 +109,56 @@ h2, h3, h4,div, span {
     font-size: 1.2em;
     text-align: center;
 }
-#minButton{
-    
+#buttons{
+    float: left;
+    margin-top: 15px;
+    margin-left: 25px;
 }
-#maxButton{
-    
+.minButton {
+	-moz-box-shadow: 0px 10px 14px -7px #383838;
+	-webkit-box-shadow: 0px 10px 14px -7px #383838;
+	box-shadow: 0px 10px 14px -7px #383838;
+	background-color:#FFF;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+	color:#000000;
+	font-family:arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:8px 14px;
+	text-decoration:none;
 }
-
+.minButton:hover {
+	background-color:#595959;
+}
+.minButton:active {
+	position:relative;
+	top:1px;
+}
+.maxButton {
+	-moz-box-shadow: 0px 10px 14px -7px #383838;
+	-webkit-box-shadow: 0px 10px 14px -7px #383838;
+	box-shadow: 0px 10px 14px -7px #383838;
+	background-color:#FFF;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+	color:#000000;
+	font-family:arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:8px 14px;
+	text-decoration:none;
+}
+.maxButton:hover {
+	background-color:#595959;
+}
+.maxButton:active {
+	position:relative;
+	top:1px;
+}
