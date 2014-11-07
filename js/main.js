@@ -17,7 +17,7 @@ $(document).ready(function(){
         }).addTo(map);
 
     //push geojson data to load and create different map components
-    $.getJSON("data/leafletmapdata.geojson")
+    $.getJSON("leaflet%20lab/data/leafletmapdata.geojson")
         .done(function(data) {
             var info = processData(data);
             createPropSymbols(info.timestamps, data);
